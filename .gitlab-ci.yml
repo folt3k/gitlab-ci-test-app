@@ -1,11 +1,26 @@
-run_tests:
+stages:
+  - test
+  - build
+  - push-image
+
+test:
+  stage: test
   image: node:18.16-alpine
   before_script:
     - npm install
   script:
     - npm run test
 
-build-image:
+build:
+  stage: build
+  image: node:18.16-alpine
+  before_script:
+    - npm install
+  script:
+    - npm run build
+
+push-image:
+  stage: push-image
   image: docker:24
   services:
     - docker:24-dind
