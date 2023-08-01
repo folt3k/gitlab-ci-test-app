@@ -2,6 +2,7 @@ stages:
   - test
   - build
   - push-image
+  - deploy
 
 test:
   stage: test
@@ -31,3 +32,13 @@ push-image:
   script:
     - docker build -t folt3k/gitlab-ci-test-app .
     - docker push folt3k/gitlab-ci-test-app
+
+deploy:
+  stage: deploy
+  before_script:
+    - chmod 400 $DEPLOY_SSH_KEY
+  script:
+    - ssh -o StrictHostKeyChecking=no -i $DEPLOY_SSH_KEY ubuntu@54.37.73.239 "
+      docker login -u $DOCKER_USER -p $DOCKER_PASS &&
+      docker ps -aq | xargs docker stop | xargs docker rm &&
+      docker run -d -p 8000:8000 folt3k/gitlab-ci-test-app:latest"
